@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>WellGym — Protótipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #C8973A; --gold-l: #F0C87A; --gold-pale: #FBF3E3;
+  --dark: #111111; --dark-2: #1C1C1C; --dark-3: #252525; --dark-4: #2E2E2E;
+  --mid: #888; --border: #333; --white: #FFFFFF;
+  --green: #4CAF50; --green-d: #2E7D32; --green-pale: #1A2E1A;
+  --red: #EF5350; --red-pale: #2E1A1A;
+  --blue: #42A5F5;
+  --radius: 12px; --radius-lg: 18px; --radius-xl: 24px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0A0A0A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  color: var(--white);
+}
+
+/* DEVICE SHELL */
+.device {
+  width: 390px;
+  height: 844px;
+  background: var(--dark);
+  border-radius: 50px;
+  box-shadow: 0 0 0 2px #333, 0 0 0 4px #1a1a1a, 0 40px 80px rgba(0,0,0,.8);
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* STATUS BAR */
+.status-bar {
+  height: 44px;
+  background: var(--dark-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+.status-time { font-size: 15px; font-weight: 600; }
+.status-icons { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.status-icons svg { width: 16px; height: 16px; fill: var(--white); }
+
+/* SCREENS */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--dark);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+.screen.active { opacity: 1; pointer-events: all; }
+
+/* SCROLL AREA */
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-area::-webkit-scrollbar { display: none; }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  height: 72px;
+  background: var(--dark-2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--mid);
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  transition: color .15s;
+}
+.nav-item.active { color: var(--gold); }
+.nav-item svg { width: 22px; height: 22px; }
+.nav-item.active svg { stroke: var(--gold); }
+.nav-item:not(.active) svg { stroke: var(--mid); }
+
+/* BUTTONS */
+.btn-primary {
+  width: 100%;
+  padding: 18px;
+  background: var(--gold);
+  color: var(--dark);
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+}
+.btn-primary:active { transform: scale(.98); background: var(--gold-l); }
+
+.btn-secondary {
+  width: 100%;
+  padding: 16px;
+  background: transparent;
+  color: var(--gold);
+  border: 1.5px solid var(--gold);
+  border-radius: var(--radius);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-secondary:active { background: rgba(200,151,58,.1); }
+
+.btn-ghost {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+/* INPUTS */
+.input-group { margin-bottom: 20px; position: relative; }
+.input-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--gold);
+  margin-bottom: 8px;
+  display: block;
+}
+.input-field {
+  width: 100%;
+  padding: 15px 16px;
+  background: var(--dark-3);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--white);
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color .15s;
+}
+.input-field::placeholder { color: #555; }
+.input-field:focus { border-color: var(--gold); }
+
+/* CARDS */
+.card {
+  background: var(--dark-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.card-gold { border-color: rgba(200,151,58,.3); }
+
+/* SECTION TITLE */
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: .06em;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+/* HEADER BAR */
+.header-bar {
+  padding: 16px 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: var(--dark-2);
+  flex-shrink: 0;
+}
+.header-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: .06em;
+}
+.back-btn {
+  width: 36px; height: 36px;
+  background: var(--dark-3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: none;
+  color: var(--white);
+}
+.back-btn svg { width: 18px; height: 18px; stroke: var(--white); fill: none; }
+
+/* BADGE */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-green { background: var(--green-pale); color: var(--green); }
+.badge-gold { background: rgba(200,151,58,.15); color: var(--gold); }
+.badge-red { background: var(--red-pale); color: var(--red); }
+
+/* DAY DOT */
+.day-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600;
+}
+.day-dot.done { background: var(--gold); color: var(--dark); }
+.day-dot.today { border: 2px solid var(--gold); color: var(--gold); }
+.day-dot.rest { background: var(--dark-3); color: var(--mid); }
+
+/* EXERCISE ROW */
+.exercise-row {
+  display: flex; align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.exercise-row:last-child { border-bottom: none; }
+.ex-icon {
+  width: 44px; height: 44px;
+  background: var(--dark-3);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.ex-info { flex: 1; }
+.ex-name { font-size: 14px; font-weight: 600; }
+.ex-meta { font-size: 12px; color: var(--mid); margin-top: 2px; }
+.ex-action { color: var(--gold); font-size: 12px; font-weight: 600; cursor: pointer; }
+
+/* SET ROW */
+.set-row {
+  display: flex; align-items: center;
+  padding: 10px 0;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.set-row:last-child { border-bottom: none; }
+.set-num { font-size: 12px; color: var(--mid); width: 28px; }
+.set-input {
+  flex: 1;
+  background: var(--dark-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--white);
+  font-size: 14px; font-weight: 600;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+}
+.set-input:focus { border-color: var(--gold); }
+.set-check {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.set-check.done { background: var(--green); border-color: var(--green); }
+.set-check svg { width: 16px; height: 16px; stroke: var(--white); fill: none; }
+
+/* PROGRESS BAR */
+.progress-bar-wrap { background: var(--dark-3); border-radius: 4px; height: 6px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: var(--gold); border-radius: 4px; transition: width .6s ease; }
+
+/* CHART MINI */
+.mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 48px; }
+.mini-bar { background: var(--gold); border-radius: 3px 3px 0 0; flex: 1; opacity: .7; }
+.mini-bar.active { opacity: 1; }
+
+/* STAT CARD */
+.stat-card {
+  background: var(--dark-3);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+}
+.stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: .04em;
+  color: var(--gold);
+  line-height: 1;
+}
+.stat-label { font-size: 11px; color: var(--mid); margin-top: 4px; }
+
+/* REST TIMER */
+.rest-timer {
+  background: var(--dark-2);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.rest-timer-label { font-size: 12px; color: var(--mid); }
+.rest-timer-val { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); }
+
+/* FORM CHECKBOX */
+.check-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+.check-box {
+  width: 20px; height: 20px;
+  border: 2px solid var(--gold);
+  border-radius: 4px;
+  flex-shrink: 0; margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.check-box.checked { background: var(--gold); }
+.check-box svg { width: 12px; height: 12px; stroke: var(--dark); fill: none; }
+.check-text { font-size: 12px; color: var(--mid); line-height: 1.6; }
+.check-text a { color: var(--gold); }
+
+/* AVATAR */
+.avatar {
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: var(--dark-3);
+  border: 3px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: var(--gold);
+  margin: 0 auto 12px;
+  position: relative;
+}
+.avatar-edit {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 26px; height: 26px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.avatar-edit svg { width: 12px; height: 12px; fill: var(--dark); }
+
+/* SELECT */
+.select-field {
+  width: 100%;
+  padding: 15px 16px;
+  background: var(--dark-3);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--white);
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+.select-wrap { position: relative; }
+.select-wrap::after {
+  content: '▾';
+  position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+  color: var(--mid); pointer-events: none;
+}
+
+/* MACRO BAR */
+.macro-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.macro-item { flex: 1; }
+.macro-label { font-size: 10px; color: var(--mid); margin-bottom: 4px; }
+.macro-val { font-size: 13px; font-weight: 600; }
+.macro-pbar { height: 4px; background: var(--dark-3); border-radius: 2px; overflow: hidden; margin-top: 4px; }
+.macro-pfill { height: 100%; border-radius: 2px; }
+
+/* LIST ITEM */
+.list-item {
+  display: flex; align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer; gap: 14px;
+}
+.list-item:last-child { border-bottom: none; }
+.list-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+.list-text { flex: 1; font-size: 14px; font-weight: 500; }
+.list-arrow { color: var(--mid); font-size: 16px; }
+
+/* TOAST */
+.toast {
+  position: absolute;
+  bottom: 90px; left: 20px; right: 20px;
+  background: var(--green);
+  color: var(--white);
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  font-size: 14px; font-weight: 600;
+  display: flex; align-items: center; gap: 10px;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all .3s ease;
+  z-index: 100;
+  pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* TIMER DISPLAY */
+.timer-display {
+  text-align: center;
+  padding: 16px;
+}
+.timer-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 56px;
+  letter-spacing: .04em;
+  color: var(--gold);
+  line-height: 1;
+}
+.timer-label { font-size: 12px; color: var(--mid); margin-top: 4px; }
+
+/* CHART LINE SVG */
+.chart-svg { width: 100%; height: 100px; }
+
+/* MUSCLE GROUP HEADER */
+.muscle-header {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  letter-spacing: .1em;
+  color: var(--gold);
+  padding: 16px 0 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+/* WORKOUT CARD (list) */
+.workout-card {
+  background: var(--dark-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.workout-card:hover { border-color: var(--gold); }
+.workout-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: .05em; }
+.workout-card-meta { font-size: 12px; color: var(--mid); margin-top: 6px; display: flex; gap: 12px; }
+.workout-card-meta span { display: flex; align-items: center; gap: 4px; }
+
+/* SEARCH */
+.search-wrap { position: relative; }
+.search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); }
+.search-icon svg { width: 16px; height: 16px; stroke: var(--mid); fill: none; }
+.search-input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  background: var(--dark-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--white);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+}
+.search-input::placeholder { color: #555; }
+.search-input:focus { border-color: var(--gold); }
+
+/* FOCUS MODE BANNER */
+.focus-banner {
+  background: var(--gold);
+  color: var(--dark);
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: .04em;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="device" id="app">
+
+  <!-- ═══════════ SCREEN 1: SPLASH ═══════════ -->
+  <div class="screen active" id="s-splash" style="background: var(--dark); justify-content: center; align-items: center;">
+    <div style="text-align:center; padding: 40px;">
+      <div style="width:100px;height:100px;background:var(--gold);border-radius:28px;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;box-shadow:0 0 40px rgba(200,151,58,.4)">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+          <path d="M8 26h4l4-12 8 24 6-16 4 10 4-6h6" stroke="#111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:.08em;color:var(--white)">WELL<span style="color:var(--gold)">GYM</span></div>
+      <div style="font-size:13px;color:var(--mid);margin-top:8px;letter-spacing:.06em">TREINO. PROGRESSO. RESULTADO.</div>
+      <div style="margin-top:48px">
+        <div style="width:120px;height:4px;background:var(--dark-3);border-radius:2px;margin:0 auto;overflow:hidden">
+          <div id="splash-bar" style="height:100%;background:var(--gold);border-radius:2px;width:0;transition:width 2s linear"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SCREEN 2: LOGIN ═══════════ -->
+  <div class="screen" id="s-login">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.56 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 6 0 016.95 0M12 20h.01" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M22 11v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="4" y="9" width="10" height="7" rx="1" fill="currentColor"/></svg>
+      </div>
+    </div>
+    <div class="scroll-area" style="padding: 40px 24px 32px;">
+      <div style="text-align:center; margin-bottom: 40px;">
+        <div style="width:64px;height:64px;background:var(--gold);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+          <svg width="34" height="34" viewBox="0 0 52 52" fill="none"><path d="M8 26h4l4-12 8 24 6-16 4 10 4-6h6" stroke="#111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.08em">WELL<span style="color:var(--gold)">GYM</span></div>
+        <div style="font-size:12px;color:var(--mid);margin-top:4px">Entre na sua conta</div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">E-mail</label>
+        <input class="input-field" type="email" placeholder="exemplo@email.com" value="marina@email.com">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Senha</label>
+        <input class="input-field" type="password" placeholder="••••••••" value="12345678">
+      </div>
+      <div style="margin-bottom: 28px; text-align: right;">
+        <button class="btn-ghost">Esqueceu a senha?</button>
+      </div>
+      <button class="btn-primary" onclick="go('s-dashboard')">ENTRAR</button>
+      <div style="margin-top:20px; text-align:center; font-size:13px; color:var(--mid)">
+        Não tem conta? <button class="btn-ghost" onclick="go('s-cadastro')" style="font-size:13px">Cadastre-se</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SCREEN 3: CADASTRO ═══════════ -->
+  <div class="screen" id="s-cadastro">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M22 11v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="4" y="9" width="10" height="7" rx="1" fill="currentColor"/></svg></div>
+    </div>
+    <div class="header-bar">
+      <button class="back-btn" onclick="go('s-login')">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="header-title">CRIAR CONTA</span>
+      <div style="width:36px"></div>
+    </div>
+    <div class="scroll-area" style="padding: 24px;">
+      <div class="input-group">
+        <label class="input-label">Nome Completo</label>
+        <input class="input-field" type="text" placeholder="Seu nome completo">
+      </div>
+      <div class="input-group">
+        <label class="input-label">E-mail</label>
+        <input class="input-field" type="email" placeholder="exemplo@email.com">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Senha</label>
+        <input class="input-field" type="password" placeholder="Mínimo 8 caracteres">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Confirmar Senha</label>
+        <input class="input-field" type="password" placeholder="Repita sua senha">
+      </div>
+      <div style="margin-bottom: 24px;">
+        <div class="check-row">
+          <div class="check-box checked" id="terms-check" onclick="toggleCheck(this)">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="check-text">Aceito os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> do WellGym</span>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="go('s-dashboard')">CRIAR MINHA CONTA</button>
+      <div style="margin-top:16px; text-align:center;">
+        <button class="btn-ghost" onclick="go('s-login')" style="font-size:13px">Já tenho conta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SCREEN 4: DASHBOARD ═══════════ -->
+  <div class="screen" id="s-dashboard">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><rect x="4" y="9" width="10" height="7" rx="1" fill="currentColor"/></svg></div>
+    </div>
+    <div class="scroll-area" style="padding: 20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div>
+          <div style="font-size:12px;color:var(--mid)">Segunda, 23 Jun</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em">OLÁ, <span style="color:var(--gold)">MARINA</span> 👋</div>
+        </div>
+        <div style="width:42px;height:42px;background:var(--dark-3);border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:'Bebas Neue';font-size:16px;color:var(--gold)" onclick="navTo('s-perfil','s-dashboard')">MC</div>
+      </div>
+
+      <!-- Meta semanal -->
+      <div class="card card-gold" style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="section-title" style="margin-bottom:0">META SEMANAL</div>
+          <span class="badge badge-gold">4 de 5 treinos</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--mid);margin-bottom:6px">S</div>
+            <div class="day-dot done">✓</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--mid);margin-bottom:6px">T</div>
+            <div class="day-dot done">✓</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--mid);margin-bottom:6px">Q</div>
+            <div class="day-dot done">✓</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--mid);margin-bottom:6px">Q</div>
+            <div class="day-dot rest">–</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--mid);margin-bottom:6px">S</div>
+            <div class="day-dot done">✓</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--mid);margin-bottom:6px">S</div>
+            <div class="day-dot today">5</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--mid);margin-bottom:6px">D</div>
+            <div class="day-dot rest">–</div>
+          </div>
+        </div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:80%"></div></div>
+      </div>
+
+      <!-- Macros do dia -->
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="section-title" style="margin-bottom:0;font-size:16px">MACROS DE HOJE</div>
+          <span style="font-size:20px;font-weight:700;color:var(--gold);font-family:'Bebas Neue'">1.840 <span style="font-size:14px">/ 2.200 kcal</span></span>
+        </div>
+        <div style="background:var(--gold);color:var(--dark);border-radius:6px;padding:8px 12px;font-size:12px;font-weight:700;margin-bottom:14px;display:inline-block">
+          ⚡ Faltam 58g de proteína para a meta
+        </div>
+        <div class="macro-row">
+          <div class="macro-item">
+            <div class="macro-label">Proteína</div>
+            <div class="macro-val" style="color:#4CAF50">102g</div>
+            <div class="macro-pbar"><div class="macro-pfill" style="width:64%;background:#4CAF50"></div></div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-label">Carb</div>
+            <div class="macro-val" style="color:var(--blue)">210g</div>
+            <div class="macro-pbar"><div class="macro-pfill" style="width:70%;background:var(--blue)"></div></div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-label">Gordura</div>
+            <div class="macro-val" style="color:var(--gold)">48g</div>
+            <div class="macro-pbar"><div class="macro-pfill" style="width:55%;background:var(--gold)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Próximo treino -->
+      <button class="btn-primary" onclick="go('s-treino-ativo')" style="margin-bottom:16px">
+        ▶ INICIAR TREINO B — COSTAS & BÍCEPS
+      </button>
+
+      <!-- Atividade recente -->
+      <div class="section-title">ATIVIDADE RECENTE</div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+          <div>
+            <div style="font-family:'Bebas Neue';font-size:17px;letter-spacing:.04em">ÚLTIMO TREINO: PEITO & TRÍCEPS</div>
+            <div style="font-size:12px;color:var(--mid);margin-top:4px">Ontem · 52 min · 4.200 kg levantados</div>
+          </div>
+          <span class="badge badge-green">✓</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div class="stat-card"><div class="stat-val">12</div><div class="stat-label">Séries</div></div>
+          <div class="stat-card"><div class="stat-val">52</div><div class="stat-label">Minutos</div></div>
+          <div class="stat-card"><div class="stat-val">4.2t</div><div class="stat-label">Volume</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-family:'Bebas Neue';font-size:17px;letter-spacing:.04em;margin-bottom:14px">TOTAL LEVANTADO ESTA SEMANA</div>
+        <div style="font-family:'Bebas Neue';font-size:40px;color:var(--gold);letter-spacing:.04em">18.400 <span style="font-size:20px">KG</span></div>
+        <div class="mini-chart" style="margin-top:14px">
+          <div class="mini-bar" style="height:40%"></div>
+          <div class="mini-bar" style="height:55%"></div>
+          <div class="mini-bar" style="height:70%"></div>
+          <div class="mini-bar" style="height:50%"></div>
+          <div class="mini-bar" style="height:80%"></div>
+          <div class="mini-bar active" style="height:95%"></div>
+          <div class="mini-bar" style="height:20%;opacity:.3"></div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item active" onclick="navTo('s-dashboard','s-dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        Início
+      </button>
+      <button class="nav-item" onclick="navTo('s-treinos','s-dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 4v16M18 4v16M3 8h18M3 16h18"/></svg>
+        Treinos
+      </button>
+      <button class="nav-item" onclick="navTo('s-progresso','s-dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Progresso
+      </button>
+      <button class="nav-item" onclick="navTo('s-perfil','s-dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Perfil
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════ SCREEN 5: TREINOS ═══════════ -->
+  <div class="screen" id="s-treinos">
+    <div class="status-bar"><span class="status-time">9:41</span></div>
+    <div class="header-bar">
+      <span class="header-title">MEUS TREINOS</span>
+      <button style="background:var(--gold);border:none;border-radius:8px;padding:8px 14px;font-family:'Bebas Neue';font-size:15px;color:var(--dark);cursor:pointer;letter-spacing:.04em" onclick="go('s-biblioteca')">+ EXERCÍCIO</button>
+    </div>
+    <div class="scroll-area" style="padding: 20px;">
+      <div class="section-title">DIVISÃO ATUAL</div>
+      <div class="workout-card" onclick="go('s-treino-ativo')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--gold);letter-spacing:.06em;margin-bottom:4px">TREINO A</div>
+            <div class="workout-card-title">PEITO & TRÍCEPS</div>
+            <div class="workout-card-meta">
+              <span>🏋 6 exercícios</span>
+              <span>⏱ ~55 min</span>
+            </div>
+          </div>
+          <span class="badge badge-gold">Seg/Qui</span>
+        </div>
+      </div>
+      <div class="workout-card" onclick="go('s-treino-ativo')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--gold);letter-spacing:.06em;margin-bottom:4px">TREINO B</div>
+            <div class="workout-card-title">COSTAS & BÍCEPS</div>
+            <div class="workout-card-meta">
+              <span>🏋 5 exercícios</span>
+              <span>⏱ ~50 min</span>
+            </div>
+          </div>
+          <span class="badge badge-green">Hoje</span>
+        </div>
+      </div>
+      <div class="workout-card" onclick="go('s-treino-ativo')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--gold);letter-spacing:.06em;margin-bottom:4px">TREINO C</div>
+            <div class="workout-card-title">PERNAS</div>
+            <div class="workout-card-meta">
+              <span>🏋 7 exercícios</span>
+              <span>⏱ ~65 min</span>
+            </div>
+          </div>
+          <span class="badge badge-gold">Qua/Sáb</span>
+        </div>
+      </div>
+      <div class="workout-card" onclick="go('s-treino-ativo')">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--mid);letter-spacing:.06em;margin-bottom:4px">TREINO D</div>
+          <div class="workout-card-title" style="color:var(--mid)">OMBROS & ABDÔMEN</div>
+          <div class="workout-card-meta">
+            <span>🏋 5 exercícios</span>
+            <span>⏱ ~40 min</span>
+          </div>
+        </div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="section-title">TREINOS PRONTOS</div>
+      <div class="workout-card">
+        <div class="workout-card-title" style="font-size:16px">Full Body — Iniciante</div>
+        <div class="workout-card-meta"><span>🏋 8 exercícios</span><span>⭐ 4.8</span></div>
+      </div>
+      <div class="workout-card">
+        <div class="workout-card-title" style="font-size:16px">Hipertrofia — Intermediário</div>
+        <div class="workout-card-meta"><span>🏋 12 exercícios</span><span>⭐ 4.9</span></div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="navTo('s-dashboard','s-treinos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Início
+      </button>
+      <button class="nav-item active" onclick="navTo('s-treinos','s-treinos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 4v16M18 4v16M3 8h18M3 16h18"/></svg>Treinos
+      </button>
+      <button class="nav-item" onclick="navTo('s-progresso','s-treinos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progresso
+      </button>
+      <button class="nav-item" onclick="navTo('s-perfil','s-treinos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Perfil
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════ SCREEN 6: TREINO ATIVO ═══════════ -->
+  <div class="screen" id="s-treino-ativo">
+    <div class="status-bar" style="background:#0D1F0D">
+      <span class="status-time">9:41</span>
+      <div style="font-family:'Bebas Neue';font-size:13px;letter-spacing:.06em;color:var(--green)" id="treino-timer">00:00</div>
+    </div>
+    <div class="focus-banner">🎯 MODO FOCO ATIVO — TELA BLOQUEADA</div>
+    <div style="padding: 16px 20px 12px; background: var(--dark-2); border-bottom: 1px solid var(--border); flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="back-btn" onclick="go('s-treinos')" style="background:rgba(255,255,255,.08)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div style="flex:1">
+          <div style="font-size:11px;color:var(--mid)">TREINO B</div>
+          <div style="font-family:'Bebas Neue';font-size:18px;letter-spacing:.04em">COSTAS & BÍCEPS</div>
+        </div>
+      </div>
+      <div class="rest-timer" style="margin-top:12px" id="rest-area">
+        <div>
+          <div class="rest-timer-label">DESCANSO</div>
+          <div class="rest-timer-val" id="rest-val">01:30</div>
+        </div>
+        <button onclick="startRest()" style="background:var(--gold);border:none;border-radius:8px;padding:8px 16px;font-family:'Bebas Neue';font-size:14px;color:var(--dark);cursor:pointer;letter-spacing:.04em">INICIAR</button>
+      </div>
+      <div style="margin-top:10px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mid);margin-bottom:4px">
+          <span>Progresso</span><span>3 / 5 exercícios</span>
+        </div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:60%"></div></div>
+      </div>
+    </div>
+
+    <div class="scroll-area" style="padding: 16px 20px;">
+
+      <!-- Exercício 1 -->
+      <div class="card" style="border-color:var(--gold)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="font-family:'Bebas Neue';font-size:19px;letter-spacing:.05em">BARRA FIXA</div>
+          <span class="badge badge-green">Em andamento</span>
+        </div>
+        <div style="font-size:12px;color:var(--mid);margin-bottom:14px">Costas · Último: 8 reps × BW</div>
+        <div style="display:grid;grid-template-columns:40px 1fr 1fr 36px;gap:8px;margin-bottom:6px">
+          <div style="font-size:10px;color:var(--mid);text-align:center">Série</div>
+          <div style="font-size:10px;color:var(--mid);text-align:center">REPS</div>
+          <div style="font-size:10px;color:var(--mid);text-align:center">CARGA (kg)</div>
+          <div></div>
+        </div>
+        <div class="set-row">
+          <span class="set-num">S1</span>
+          <input class="set-input" type="number" value="10" min="1">
+          <input class="set-input" type="text" value="BW">
+          <button class="set-check done" onclick="toggleSet(this)"><svg viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></button>
+        </div>
+        <div class="set-row">
+          <span class="set-num">S2</span>
+          <input class="set-input" type="number" value="8" min="1">
+          <input class="set-input" type="text" value="BW">
+          <button class="set-check done" onclick="toggleSet(this)"><svg viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></button>
+        </div>
+        <div class="set-row">
+          <span class="set-num">S3</span>
+          <input class="set-input" type="number" placeholder="–" min="1">
+          <input class="set-input" type="text" placeholder="kg">
+          <button class="set-check" onclick="toggleSet(this)"><svg viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></button>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button onclick="showToast('💡 Substituição: Puxada Pulley → Mesa Romana')" style="flex:1;padding:8px;background:var(--dark-3);border:1px solid var(--border);border-radius:8px;color:var(--mid);font-size:11px;cursor:pointer">🔄 Substituir</button>
+          <button onclick="showToast('↩ Série desmarcada')" style="flex:1;padding:8px;background:var(--dark-3);border:1px solid var(--border);border-radius:8px;color:var(--mid);font-size:11px;cursor:pointer">↩ Desfazer</button>
+          <button onclick="go('s-biblioteca')" style="flex:1;padding:8px;background:var(--dark-3);border:1px solid var(--border);border-radius:8px;color:var(--mid);font-size:11px;cursor:pointer">▶ Vídeo</button>
+        </div>
+      </div>
+
+      <!-- Exercício 2 -->
+      <div class="card">
+        <div style="font-family:'Bebas Neue';font-size:19px;letter-spacing:.05em;margin-bottom:4px">REMADA CURVADA</div>
+        <div style="font-size:12px;color:var(--mid);margin-bottom:14px">Costas · Último: 3×10 × 60kg</div>
+        <div class="set-row">
+          <span class="set-num">S1</span>
+          <input class="set-input" type="number" placeholder="10" min="1">
+          <input class="set-input" type="text" placeholder="60">
+          <button class="set-check" onclick="toggleSet(this)"><svg viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></button>
+        </div>
+        <div class="set-row">
+          <span class="set-num">S2</span>
+          <input class="set-input" type="number" placeholder="10" min="1">
+          <input class="set-input" type="text" placeholder="60">
+          <button class="set-check" onclick="toggleSet(this)"><svg viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></button>
+        </div>
+        <div class="set-row">
+          <span class="set-num">S3</span>
+          <input class="set-input" type="number" placeholder="10" min="1">
+          <input class="set-input" type="text" placeholder="60">
+          <button class="set-check" onclick="toggleSet(this)"><svg viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></button>
+        </div>
+        <div style="margin-top:12px">
+          <input class="input-field" placeholder="📝 Anotações (sensações, ajustes...)" style="padding:10px 14px;font-size:12px">
+        </div>
+      </div>
+
+      <!-- Exercício 3 -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between">
+          <div style="font-family:'Bebas Neue';font-size:19px;letter-spacing:.05em">ROSCA DIRETA</div>
+          <span class="badge" style="background:var(--dark-3);color:var(--mid)">Próximo</span>
+        </div>
+        <div style="font-size:12px;color:var(--mid);margin-top:4px">Bíceps · 3 séries × 12 reps × 20kg</div>
+      </div>
+
+      <div style="height:16px"></div>
+      <button class="btn-primary" onclick="go('s-dashboard');showToast('🏆 Treino concluído! +4.200kg levantados')">FINALIZAR TREINO</button>
+      <div style="height:20px"></div>
+    </div>
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <!-- ═══════════ SCREEN 7: PROGRESSO ═══════════ -->
+  <div class="screen" id="s-progresso">
+    <div class="status-bar"><span class="status-time">9:41</span></div>
+    <div class="header-bar">
+      <span class="header-title">PROGRESSO</span>
+      <button style="background:none;border:none;color:var(--gold);font-size:13px;font-weight:600;cursor:pointer">Calendário</button>
+    </div>
+    <div class="scroll-area" style="padding: 20px;">
+
+      <div class="card card-gold">
+        <div class="section-title" style="font-size:16px">PROGRESSÃO DE CARGA — AGACHAMENTO</div>
+        <div style="display:flex;align-items:flex-end;gap:2px;height:80px;margin-bottom:8px;margin-top:8px">
+          <div style="flex:1;background:rgba(200,151,58,.2);border-radius:3px 3px 0 0;height:45%"></div>
+          <div style="flex:1;background:rgba(200,151,58,.3);border-radius:3px 3px 0 0;height:55%"></div>
+          <div style="flex:1;background:rgba(200,151,58,.4);border-radius:3px 3px 0 0;height:62%"></div>
+          <div style="flex:1;background:rgba(200,151,58,.5);border-radius:3px 3px 0 0;height:70%"></div>
+          <div style="flex:1;background:rgba(200,151,58,.7);border-radius:3px 3px 0 0;height:80%"></div>
+          <div style="flex:1;background:var(--gold);border-radius:3px 3px 0 0;height:100%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mid)">
+          <span>Jan</span><span>Fev</span><span>Mar</span><span>Abr</span><span>Mai</span><span>Jun</span>
+        </div>
+        <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:11px;color:var(--mid)">Carga atual</div>
+            <div style="font-family:'Bebas Neue';font-size:28px;color:var(--gold)">100 <span style="font-size:16px">kg</span></div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:var(--mid)">Próxima sessão</div>
+            <div style="font-family:'Bebas Neue';font-size:28px;color:var(--green)">102.5 <span style="font-size:16px">kg</span></div>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:12px;background:var(--green-pale);border-radius:8px;padding:8px 12px;color:var(--green)">
+          📈 +12.5kg nos últimos 6 meses (progressão +14%)
+        </div>
+      </div>
+
+      <!-- PRs -->
+      <div class="section-title">RECORDES PESSOAIS</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div class="card" style="text-align:center;padding:16px">
+          <div style="font-size:11px;color:var(--mid);margin-bottom:6px">AGACHAMENTO</div>
+          <div style="font-family:'Bebas Neue';font-size:30px;color:var(--gold)">100<span style="font-size:14px">kg</span></div>
+          <div style="font-size:10px;color:var(--green);margin-top:4px">↑ +5kg este mês</div>
+        </div>
+        <div class="card" style="text-align:center;padding:16px">
+          <div style="font-size:11px;color:var(--mid);margin-bottom:6px">SUPINO</div>
+          <div style="font-family:'Bebas Neue';font-size:30px;color:var(--gold)">80<span style="font-size:14px">kg</span></div>
+          <div style="font-size:10px;color:var(--green);margin-top:4px">↑ +2.5kg este mês</div>
+        </div>
+        <div class="card" style="text-align:center;padding:16px">
+          <div style="font-size:11px;color:var(--mid);margin-bottom:6px">TERRA</div>
+          <div style="font-family:'Bebas Neue';font-size:30px;color:var(--gold)">120<span style="font-size:14px">kg</span></div>
+          <div style="font-size:10px;color:var(--green);margin-top:4px">↑ +7.5kg este mês</div>
+        </div>
+        <div class="card" style="text-align:center;padding:16px">
+          <div style="font-size:11px;color:var(--mid);margin-bottom:6px">ROSCA</div>
+          <div style="font-family:'Bebas Neue';font-size:30px;color:var(--gold)">28<span style="font-size:14px">kg</span></div>
+          <div style="font-size:10px;color:var(--mid);margin-top:4px">Estável</div>
+        </div>
+      </div>
+
+      <!-- Medidas -->
+      <div class="section-title">MEDIDAS CORPORAIS</div>
+      <div class="card">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div style="text-align:center">
+            <div style="font-size:11px;color:var(--mid);margin-bottom:4px">PESO</div>
+            <div style="font-family:'Bebas Neue';font-size:26px;color:var(--white)">72<span style="font-size:14px">kg</span></div>
+            <div style="font-size:10px;color:var(--green)">↓ -1.2kg</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:11px;color:var(--mid);margin-bottom:4px">% GORDURA</div>
+            <div style="font-family:'Bebas Neue';font-size:26px;color:var(--white)">18<span style="font-size:14px">%</span></div>
+            <div style="font-size:10px;color:var(--green)">↓ -0.8%</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:11px;color:var(--mid);margin-bottom:4px">STREAK</div>
+            <div style="font-family:'Bebas Neue';font-size:26px;color:var(--gold)">14🔥</div>
+            <div style="font-size:10px;color:var(--gold)">dias seguidos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="navTo('s-dashboard','s-progresso')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Início
+      </button>
+      <button class="nav-item" onclick="navTo('s-treinos','s-progresso')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 4v16M18 4v16M3 8h18M3 16h18"/></svg>Treinos
+      </button>
+      <button class="nav-item active" onclick="navTo('s-progresso','s-progresso')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progresso
+      </button>
+      <button class="nav-item" onclick="navTo('s-perfil','s-progresso')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Perfil
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════ SCREEN 8: PERFIL ═══════════ -->
+  <div class="screen" id="s-perfil">
+    <div class="status-bar"><span class="status-time">9:41</span></div>
+    <div class="header-bar">
+      <span class="header-title">PERFIL</span>
+      <button style="background:none;border:none;color:var(--gold);font-size:13px;font-weight:600;cursor:pointer">Salvar</button>
+    </div>
+    <div class="scroll-area" style="padding: 24px 20px;">
+      <div style="text-align:center;margin-bottom:28px">
+        <div class="avatar">
+          MC
+          <div class="avatar-edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+        </div>
+        <div style="font-family:'Bebas Neue';font-size:22px;letter-spacing:.04em">MARINA CASTRO</div>
+        <div style="background:var(--dark-3);border-radius:12px;padding:4px 14px;display:inline-block;font-size:12px;color:var(--gold);margin-top:6px;font-weight:600">✓ Membro WellGym</div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Nome Completo</label>
+        <input class="input-field" value="Marina Castro">
+      </div>
+      <div class="input-group">
+        <label class="input-label">E-mail</label>
+        <input class="input-field" type="email" value="marina@email.com">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="input-group">
+          <label class="input-label">Peso (kg)</label>
+          <input class="input-field" type="number" value="72">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Altura (cm)</label>
+          <input class="input-field" type="number" value="168">
+        </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Objetivo</label>
+        <div class="select-wrap">
+          <select class="select-field">
+            <option>Ganho de Massa</option>
+            <option>Emagrecimento</option>
+            <option>Definição</option>
+            <option>Performance</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Nível de Atividade</label>
+        <div class="select-wrap">
+          <select class="select-field">
+            <option>Ativo (3–4x semana)</option>
+            <option>Muito ativo (5+x semana)</option>
+            <option>Moderado (1–2x semana)</option>
+          </select>
+        </div>
+      </div>
+      <div style="height:8px"></div>
+      <button class="btn-primary" onclick="showToast('✅ Perfil atualizado com sucesso!')" style="margin-bottom:12px">SALVAR ALTERAÇÕES</button>
+      <button class="btn-secondary" onclick="go('s-login')">SAIR DA CONTA</button>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="navTo('s-dashboard','s-perfil')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Início
+      </button>
+      <button class="nav-item" onclick="navTo('s-treinos','s-perfil')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 4v16M18 4v16M3 8h18M3 16h18"/></svg>Treinos
+      </button>
+      <button class="nav-item" onclick="navTo('s-progresso','s-perfil')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progresso
+      </button>
+      <button class="nav-item active" onclick="navTo('s-perfil','s-perfil')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Perfil
+      </button>
+    </div>
+    <div class="toast" id="toast-perfil"></div>
+  </div>
+
+  <!-- ═══════════ SCREEN 9: BIBLIOTECA ═══════════ -->
+  <div class="screen" id="s-biblioteca">
+    <div class="status-bar"><span class="status-time">9:41</span></div>
+    <div class="header-bar">
+      <button class="back-btn" onclick="go('s-treinos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="header-title">BIBLIOTECA</span>
+      <div style="width:36px"></div>
+    </div>
+    <div style="padding: 12px 20px; background: var(--dark-2); border-bottom: 1px solid var(--border); flex-shrink:0;">
+      <div class="search-wrap">
+        <div class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <input class="search-input" placeholder="Buscar exercícios..." oninput="filterEx(this.value)">
+      </div>
+    </div>
+    <div class="scroll-area" style="padding: 16px 20px;" id="ex-list">
+
+      <div class="muscle-header">PEITO</div>
+      <div class="exercise-row">
+        <div class="ex-icon">💪</div>
+        <div class="ex-info">
+          <div class="ex-name">Supino com Barra</div>
+          <div class="ex-meta">Peitoral maior · Halteres, Smith</div>
+        </div>
+        <span class="ex-action" onclick="showToast('✅ Supino adicionado ao Treino A')">+ Adicionar</span>
+      </div>
+      <div class="exercise-row">
+        <div class="ex-icon">🤸</div>
+        <div class="ex-info">
+          <div class="ex-name">Crucifixo</div>
+          <div class="ex-meta">Peitoral · Halteres, Cabo</div>
+        </div>
+        <span class="ex-action" onclick="showToast('✅ Crucifixo adicionado ao Treino A')">+ Adicionar</span>
+      </div>
+      <div class="exercise-row">
+        <div class="ex-icon">🤸</div>
+        <div class="ex-info">
+          <div class="ex-name">Flexões</div>
+          <div class="ex-meta">Peitoral, Tríceps · Sem equipamento</div>
+        </div>
+        <span class="ex-action" onclick="showToast('✅ Flexões adicionado ao Treino A')">+ Adicionar</span>
+      </div>
+
+      <div class="muscle-header">COSTAS</div>
+      <div class="exercise-row">
+        <div class="ex-icon">🏋</div>
+        <div class="ex-info">
+          <div class="ex-name">Barra Fixa</div>
+          <div class="ex-meta">Dorsais, Bíceps · Peso corporal</div>
+        </div>
+        <span class="ex-action" onclick="showToast('✅ Barra Fixa adicionado ao Treino B')">+ Adicionar</span>
+      </div>
+      <div class="exercise-row">
+        <div class="ex-icon">🏋</div>
+        <div class="ex-info">
+          <div class="ex-name">Puxada Pulley</div>
+          <div class="ex-meta">Dorsais · Polia alta</div>
+        </div>
+        <span class="ex-action" onclick="showToast('✅ Puxada adicionado ao Treino B')">+ Adicionar</span>
+      </div>
+      <div class="exercise-row">
+        <div class="ex-icon">💪</div>
+        <div class="ex-info">
+          <div class="ex-name">Remada Curvada</div>
+          <div class="ex-meta">Costas, Bíceps · Barra</div>
+        </div>
+        <span class="ex-action" onclick="showToast('✅ Remada adicionado ao Treino B')">+ Adicionar</span>
+      </div>
+
+      <div class="muscle-header">PERNAS</div>
+      <div class="exercise-row">
+        <div class="ex-icon">🦵</div>
+        <div class="ex-info">
+          <div class="ex-name">Agachamento com Barra</div>
+          <div class="ex-meta">Quadríceps, Glúteos · Barra</div>
+        </div>
+        <span class="ex-action" onclick="showToast('✅ Agachamento adicionado ao Treino C')">+ Adicionar</span>
+      </div>
+      <div class="exercise-row">
+        <div class="ex-icon">🦵</div>
+        <div class="ex-info">
+          <div class="ex-name">Leg Press</div>
+          <div class="ex-meta">Quadríceps · Máquina</div>
+        </div>
+        <span class="ex-action" onclick="showToast('✅ Leg Press adicionado ao Treino C')">+ Adicionar</span>
+      </div>
+      <div class="exercise-row">
+        <div class="ex-icon">🦵</div>
+        <div class="ex-info">
+          <div class="ex-name">Afundo</div>
+          <div class="ex-meta">Quadríceps, Glúteos · Halteres</div>
+        </div>
+        <span class="ex-action" onclick="showToast('✅ Afundo adicionado ao Treino C')">+ Adicionar</span>
+      </div>
+
+      <div class="muscle-header">OMBROS</div>
+      <div class="exercise-row">
+        <div class="ex-icon">💪</div>
+        <div class="ex-info">
+          <div class="ex-name">Desenvolvimento com Barra</div>
+          <div class="ex-meta">Deltóide · Barra, Halteres</div>
+        </div>
+        <span class="ex-action" onclick="showToast('✅ Desenvolvimento adicionado')">+ Adicionar</span>
+      </div>
+
+      <div class="muscle-header">BRAÇOS</div>
+      <div class="exercise-row">
+        <div class="ex-icon">💪</div>
+        <div class="ex-info">
+          <div class="ex-name">Rosca Direta</div>
+          <div class="ex-meta">Bíceps · Barra, Halteres</div>
+        </div>
+        <span class="ex-action" onclick="showToast('✅ Rosca adicionado ao Treino B')">+ Adicionar</span>
+      </div>
+      <div class="exercise-row">
+        <div class="ex-icon">💪</div>
+        <div class="ex-info">
+          <div class="ex-name">Tríceps Pulley</div>
+          <div class="ex-meta">Tríceps · Polia</div>
+        </div>
+        <span class="ex-action" onclick="showToast('✅ Tríceps adicionado ao Treino A')">+ Adicionar</span>
+      </div>
+
+      <div style="height:20px"></div>
+    </div>
+    <div class="toast" id="toast-bib"></div>
+  </div>
+
+</div><!-- end .device -->
+
+<!-- GLOBAL TOAST -->
+<div class="toast" id="global-toast" style="position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);width:340px"></div>
+
+<script>
+// ── Navigation ──────────────────────────────────────────────────
+function go(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  document.querySelectorAll('.scroll-area').forEach(a => a.scrollTop = 0);
+}
+
+function navTo(screenId, from) { go(screenId); }
+
+// ── Splash auto-advance ──────────────────────────────────────────
+setTimeout(() => {
+  document.getElementById('splash-bar').style.width = '100%';
+  setTimeout(() => go('s-login'), 2200);
+}, 100);
+
+// ── Set toggle ───────────────────────────────────────────────────
+function toggleSet(btn) {
+  btn.classList.toggle('done');
+}
+
+// ── Check toggle ─────────────────────────────────────────────────
+function toggleCheck(el) { el.classList.toggle('checked'); }
+
+// ── Toast ────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('global-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Treino timer ──────────────────────────────────────────────────
+let treinoSec = 0;
+let treinoInterval;
+document.getElementById('s-treino-ativo').addEventListener('transitionend', function(e) {
+  if (e.target === this && this.classList.contains('active')) {
+    clearInterval(treinoInterval);
+    treinoSec = 0;
+    treinoInterval = setInterval(() => {
+      treinoSec++;
+      const m = String(Math.floor(treinoSec/60)).padStart(2,'0');
+      const s = String(treinoSec%60).padStart(2,'0');
+      const el = document.getElementById('treino-timer');
+      if (el) el.textContent = m + ':' + s;
+    }, 1000);
+  }
+});
+
+// ── Rest timer ───────────────────────────────────────────────────
+let restInterval, restSec = 90;
+function startRest() {
+  clearInterval(restInterval);
+  restSec = 90;
+  const el = document.getElementById('rest-val');
+  restInterval = setInterval(() => {
+    restSec--;
+    const m = String(Math.floor(restSec/60)).padStart(2,'0');
+    const s = String(restSec%60).padStart(2,'0');
+    el.textContent = m + ':' + s;
+    if (restSec <= 0) {
+      clearInterval(restInterval);
+      el.textContent = '00:00';
+      showToast('✅ Descanso encerrado — próxima série!');
+    }
+  }, 1000);
+}
+
+// ── Exercise search ───────────────────────────────────────────────
+function filterEx(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('#ex-list .exercise-row').forEach(row => {
+    const name = row.querySelector('.ex-name').textContent.toLowerCase();
+    const meta = row.querySelector('.ex-meta').textContent.toLowerCase();
+    row.style.display = (name.includes(q) || meta.includes(q)) ? 'flex' : 'none';
+  });
+}
+</script>
+</body>
+</html>
