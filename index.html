@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>WellGym — Protótipo</title>
+<title>Vulcan Gym — Protótipo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -272,9 +272,11 @@ body {
   border-bottom: 1px solid rgba(255,255,255,.05);
 }
 .set-row:last-child { border-bottom: none; }
-.set-num { font-size: 12px; color: var(--mid); width: 28px; }
+.set-num { font-size: 12px; color: var(--mid); width: 28px; flex-shrink: 0; }
 .set-input {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   background: var(--dark-3);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -513,13 +515,9 @@ body {
   <!-- ═══════════ SCREEN 1: SPLASH ═══════════ -->
   <div class="screen active" id="s-splash" style="background: var(--dark); justify-content: center; align-items: center;">
     <div style="text-align:center; padding: 40px;">
-      <div style="width:100px;height:100px;background:var(--gold);border-radius:28px;display:flex;align-items:center;justify-content:center;margin:0 auto 28px;box-shadow:0 0 40px rgba(200,151,58,.4)">
-        <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-          <path d="M8 26h4l4-12 8 24 6-16 4 10 4-6h6" stroke="#111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:.08em;color:var(--white)">WELL<span style="color:var(--gold)">GYM</span></div>
-      <div style="font-size:13px;color:var(--mid);margin-top:8px;letter-spacing:.06em">TREINO. PROGRESSO. RESULTADO.</div>
+      <img src="assets/logo-vulcan.png" alt="Vulcan Gym" width="110" style="display:block;margin:0 auto 24px;filter:drop-shadow(0 0 40px rgba(200,151,58,.4))">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:.08em;color:var(--white)">VULCAN <span style="color:var(--gold)">GYM</span></div>
+      <div style="font-size:13px;color:var(--mid);margin-top:8px;letter-spacing:.06em">FORJA O TEU MELHOR</div>
       <div style="margin-top:48px">
         <div style="width:120px;height:4px;background:var(--dark-3);border-radius:2px;margin:0 auto;overflow:hidden">
           <div id="splash-bar" style="height:100%;background:var(--gold);border-radius:2px;width:0;transition:width 2s linear"></div>
@@ -539,15 +537,13 @@ body {
     </div>
     <div class="scroll-area" style="padding: 40px 24px 32px;">
       <div style="text-align:center; margin-bottom: 40px;">
-        <div style="width:64px;height:64px;background:var(--gold);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
-          <svg width="34" height="34" viewBox="0 0 52 52" fill="none"><path d="M8 26h4l4-12 8 24 6-16 4 10 4-6h6" stroke="#111" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.08em">WELL<span style="color:var(--gold)">GYM</span></div>
+        <img src="assets/logo-vulcan.png" alt="Vulcan Gym" width="72" style="display:block;margin:0 auto 12px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.08em">VULCAN <span style="color:var(--gold)">GYM</span></div>
         <div style="font-size:12px;color:var(--mid);margin-top:4px">Entre na sua conta</div>
       </div>
       <div class="input-group">
         <label class="input-label">E-mail</label>
-        <input class="input-field" type="email" placeholder="exemplo@email.com" value="marina@email.com">
+        <input class="input-field" type="email" placeholder="exemplo@email.com" value="joao.silva@vulcan.com">
       </div>
       <div class="input-group">
         <label class="input-label">Senha</label>
@@ -598,7 +594,7 @@ body {
           <div class="check-box checked" id="terms-check" onclick="toggleCheck(this)">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <span class="check-text">Aceito os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> do WellGym</span>
+          <span class="check-text">Aceito os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> do Vulcan Gym</span>
         </div>
       </div>
       <button class="btn-primary" onclick="go('s-dashboard')">CRIAR MINHA CONTA</button>
@@ -618,9 +614,9 @@ body {
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
         <div>
           <div style="font-size:12px;color:var(--mid)">Segunda, 23 Jun</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em">OLÁ, <span style="color:var(--gold)">MARINA</span> 👋</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em">OLÁ, <span style="color:var(--gold)">JAKE</span> 👋</div>
         </div>
-        <div style="width:42px;height:42px;background:var(--dark-3);border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:'Bebas Neue';font-size:16px;color:var(--gold)" onclick="navTo('s-perfil','s-dashboard')">MC</div>
+        <img src="assets/perfil-joao.jpg" alt="Perfil" style="width:42px;height:42px;border:2px solid var(--gold);border-radius:50%;object-fit:cover;cursor:pointer" onclick="navTo('s-perfil','s-dashboard')">
       </div>
 
       <!-- Meta semanal -->
@@ -1055,29 +1051,29 @@ body {
     </div>
     <div class="scroll-area" style="padding: 24px 20px;">
       <div style="text-align:center;margin-bottom:28px">
-        <div class="avatar">
-          MC
+        <div class="avatar" style="overflow:visible">
+          <img src="assets/perfil-joao.jpg" alt="João Silva" style="position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover">
           <div class="avatar-edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
         </div>
-        <div style="font-family:'Bebas Neue';font-size:22px;letter-spacing:.04em">MARINA CASTRO</div>
-        <div style="background:var(--dark-3);border-radius:12px;padding:4px 14px;display:inline-block;font-size:12px;color:var(--gold);margin-top:6px;font-weight:600">✓ Membro WellGym</div>
+        <div style="font-family:'Bebas Neue';font-size:22px;letter-spacing:.04em">JOÃO SILVA</div>
+        <div style="background:var(--dark-3);border-radius:12px;padding:4px 14px;display:inline-block;font-size:12px;color:var(--gold);margin-top:6px;font-weight:600">⭐ PLANO PRO</div>
       </div>
       <div class="input-group">
         <label class="input-label">Nome Completo</label>
-        <input class="input-field" value="Marina Castro">
+        <input class="input-field" value="João Silva">
       </div>
       <div class="input-group">
         <label class="input-label">E-mail</label>
-        <input class="input-field" type="email" value="marina@email.com">
+        <input class="input-field" type="email" value="joao.silva@vulcan.com">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="input-group">
           <label class="input-label">Peso (kg)</label>
-          <input class="input-field" type="number" value="72">
+          <input class="input-field" type="number" value="85">
         </div>
         <div class="input-group">
           <label class="input-label">Altura (cm)</label>
-          <input class="input-field" type="number" value="168">
+          <input class="input-field" type="number" value="180">
         </div>
       </div>
       <div class="input-group">
